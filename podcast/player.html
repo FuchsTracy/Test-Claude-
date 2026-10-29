@@ -1,0 +1,301 @@
+<title>Sechs-Uhr-Briefing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column, a "studio desk" player on top, the script as running text, archive below */
+:root {
+  --bg: #eef1f2;
+  --panel: #ffffff;
+  --ink: #15212a;
+  --muted: #5c6b74;
+  --line: #d5dde1;
+  --accent: #0d6670;
+  --onair: #c2410c;
+  --hl: #fbe7c6;
+  --k-welt: #2f5d9a;
+  --k-ki: #7a3e9d;
+  --k-hr: #0d6670;
+  --k-talk: #a35a07;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f171c; --panel: #16222a; --ink: #e5ecef; --muted: #93a3ad; --line: #26343d;
+  --accent: #4fb3bd; --onair: #f08a4b; --hl: #3d3221;
+  --k-welt: #7fa8e0; --k-ki: #c39be0; --k-hr: #4fb3bd; --k-talk: #e0a75a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f171c; --panel: #16222a; --ink: #e5ecef; --muted: #93a3ad; --line: #26343d;
+  --accent: #4fb3bd; --onair: #f08a4b; --hl: #3d3221;
+  --k-welt: #7fa8e0; --k-ki: #c39be0; --k-hr: #4fb3bd; --k-talk: #e0a75a; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 48px; }
+.wrap { max-width: 720px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+.mast { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.mast h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+.mast h1 span { color: var(--onair); }
+.mast .date { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+
+.desk { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 18px; }
+.desk .eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.playing .dot { background: var(--onair); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .playing .dot { animation: none; } }
+.desk h2 { font-size: clamp(1.35rem, 4.5vw, 1.85rem); font-weight: 700; }
+.controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+button { font: inherit; cursor: pointer; color: inherit; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.play { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--accent); color: var(--panel); display: grid; place-items: center; flex: none; }
+.play svg { width: 26px; height: 26px; fill: currentColor; }
+.ghost { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 8px 14px; font-family: var(--display); font-size: 0.9rem; }
+.ghost:hover { border-color: var(--accent); }
+.rate { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-left: auto; }
+.rate input { width: 110px; accent-color: var(--accent); }
+.chapters { display: flex; gap: 6px; flex-wrap: wrap; }
+.chap { border: 1px solid var(--line); background: transparent; border-radius: 8px; padding: 6px 10px; font-family: var(--display); font-size: 0.82rem; display: flex; gap: 6px; align-items: center; max-width: 100%; }
+.chap .tag { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.chap[aria-current="true"] { border-color: var(--ink); background: var(--bg); }
+.k-welt { color: var(--k-welt); } .k-ki { color: var(--k-ki); } .k-hr { color: var(--k-hr); } .k-smalltalk, .k-intro { color: var(--k-talk); }
+.meta { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+.voice { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.voice select { font: inherit; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; max-width: 100%; }
+
+.script { display: grid; gap: 30px; }
+.seg { display: grid; gap: 10px; min-width: 0; }
+.seg h3 { font-size: 1.15rem; font-weight: 500; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.seg h3 .tag { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.seg p { margin: 0; max-width: 65ch; }
+.s { border-radius: 3px; transition: background 0.2s; cursor: pointer; }
+.s.on { background: var(--hl); }
+.src { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.src a { color: var(--muted); text-underline-offset: 2px; overflow-wrap: anywhere; }
+.talk { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.talk li { padding-left: 18px; position: relative; max-width: 65ch; }
+.talk li::before { content: "»"; position: absolute; left: 0; color: var(--k-talk); font-family: var(--display); }
+
+.archive h3 { font-size: 0.8rem; font-family: var(--mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+.archive ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+.archive li button { width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 10px 2px; display: flex; gap: 14px; align-items: baseline; }
+.archive li button[aria-current="true"] { color: var(--accent); }
+.archive .d { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
+.archive .t { font-family: var(--display); min-width: 0; }
+
+.empty { color: var(--muted); max-width: 60ch; }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <h1>Sechs<span>·</span>Uhr<span>·</span>Briefing</h1>
+    <div class="date" id="today"></div>
+  </header>
+
+  <section class="desk" id="desk" aria-live="polite">
+    <div class="eyebrow"><span class="dot"></span><span id="status">Lädt Folgen …</span></div>
+    <h2 id="ep-title">Deine tägliche Folge</h2>
+    <p class="empty" id="empty">Jeden Morgen um 6 Uhr erscheint hier eine neue Folge: Weltgeschehen, KI und HR in rund zehn Minuten, zum Anhören oder Lesen.</p>
+    <div class="controls" id="controls" hidden>
+      <button class="play" id="play" aria-label="Abspielen"><svg viewBox="0 0 24 24" id="play-icon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+      <button class="ghost" id="prev" aria-label="Vorheriger Abschnitt">‹ Zurück</button>
+      <button class="ghost" id="next" aria-label="Nächster Abschnitt">Weiter ›</button>
+      <label class="rate">Tempo <input type="range" id="rate" min="0.8" max="1.6" step="0.05" value="1.05"> <span id="rate-val">1.05×</span></label>
+    </div>
+    <nav class="chapters" id="chapters" aria-label="Abschnitte"></nav>
+    <div class="voice" id="voice-row" hidden><label for="voice">Stimme</label><select id="voice"></select></div>
+    <div class="meta" id="meta"></div>
+  </section>
+
+  <article class="script" id="script"></article>
+
+  <section class="archive" id="archive" hidden>
+    <h3>Frühere Folgen</h3>
+    <ul id="archive-list"></ul>
+  </section>
+</div>
+
+<script>
+const LABEL = { intro: "Intro", welt: "Welt", ki: "KI", hr: "HR", smalltalk: "Smalltalk", outro: "Outro" };
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const fmtDate = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+$("today").textContent = new Date().toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
+
+let episodes = [];
+let current = null;
+let queue = [];      // [{seg, el, text}]
+let pos = 0;
+let playing = false;
+const synth = window.speechSynthesis;
+
+// Sätze einzeln vorlesen: lange Utterances brechen in manchen Browsern ab.
+function sentences(text) {
+  return (text.match(/[^.!?…]+[.!?…]+["“”»«)]*\s*|[^.!?…]+$/g) || [text]).map((s) => s.trim()).filter(Boolean);
+}
+
+function segmentsOf(ep) {
+  const segs = [];
+  if (ep.intro) segs.push({ kind: "intro", heading: "Guten Morgen", script: ep.intro });
+  for (const s of ep.segments || []) segs.push(s);
+  if (ep.smalltalk?.length) segs.push({ kind: "smalltalk", heading: "Für den Smalltalk", list: ep.smalltalk, script: "Und hier noch ein paar Sätze für den Smalltalk. " + ep.smalltalk.join(" ") });
+  if (ep.outro) segs.push({ kind: "outro", heading: "Zum Schluss", script: ep.outro });
+  return segs;
+}
+
+function render(ep) {
+  stop();
+  current = ep;
+  queue = []; pos = 0;
+  $("empty").hidden = true;
+  $("controls").hidden = false;
+  $("ep-title").textContent = ep.title || "Folge vom " + fmtDate(ep.date);
+  $("status").textContent = fmtDate(ep.date);
+  const segs = segmentsOf(ep);
+  const words = segs.reduce((n, s) => n + s.script.split(/\s+/).length, 0);
+  $("meta").textContent = `${segs.length} Abschnitte · ca. ${Math.max(1, Math.round(words / 140))} Min. Hörzeit`;
+
+  const script = $("script"); script.textContent = "";
+  const chapters = $("chapters"); chapters.textContent = "";
+  segs.forEach((seg, i) => {
+    const box = document.createElement("section"); box.className = "seg"; box.id = "seg-" + i;
+    const h = document.createElement("h3");
+    const tag = document.createElement("span"); tag.className = "tag k-" + seg.kind; tag.textContent = LABEL[seg.kind] || seg.kind;
+    const ht = document.createElement("span"); ht.textContent = seg.heading || "";
+    h.append(tag, ht); box.append(h);
+
+    const chip = document.createElement("button"); chip.className = "chap"; chip.dataset.seg = i;
+    const ct = document.createElement("span"); ct.className = "tag k-" + seg.kind; ct.textContent = LABEL[seg.kind] || seg.kind;
+    const cn = document.createElement("span"); cn.textContent = seg.heading || "";
+    chip.append(ct, cn);
+    chip.addEventListener("click", () => jumpTo(i));
+    chapters.append(chip);
+
+    if (seg.list) {
+      const ul = document.createElement("ul"); ul.className = "talk";
+      // Intro-Satz nur sprechen, Liste sichtbar
+      queue.push({ seg: i, el: null, text: "Und hier noch ein paar Sätze für den Smalltalk." });
+      for (const item of seg.list) {
+        const li = document.createElement("li"); li.className = "s"; li.textContent = item;
+        const q = { seg: i, el: li, text: item }; queue.push(q);
+        const idx = queue.length - 1; li.addEventListener("click", () => playFrom(idx));
+        ul.append(li);
+      }
+      box.append(ul);
+    } else {
+      for (const para of seg.script.split(/\n\s*\n/)) {
+        const p = document.createElement("p");
+        for (const s of sentences(para)) {
+          const span = document.createElement("span"); span.className = "s"; span.textContent = s + " ";
+          queue.push({ seg: i, el: span, text: s });
+          const idx = queue.length - 1; span.addEventListener("click", () => playFrom(idx));
+          p.append(span);
+        }
+        box.append(p);
+      }
+    }
+    if (seg.sources?.length) {
+      const src = document.createElement("div"); src.className = "src";
+      for (const s of seg.sources) {
+        const a = document.createElement("a"); a.href = s.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = s.title || new URL(s.url).hostname;
+        src.append(a);
+      }
+      box.append(src);
+    }
+    script.append(box);
+  });
+  highlight();
+  renderArchive();
+}
+
+function highlight() {
+  document.querySelectorAll(".s.on").forEach((e) => e.classList.remove("on"));
+  const q = queue[pos];
+  if (q?.el && (playing || pos > 0)) q.el.classList.add("on");
+  document.querySelectorAll(".chap").forEach((c) => c.setAttribute("aria-current", String(q && +c.dataset.seg === q.seg)));
+}
+
+function voiceFor() {
+  const voices = synth?.getVoices() || [];
+  const chosen = store.get("voice");
+  return voices.find((v) => v.name === chosen) || voices.find((v) => v.lang?.startsWith("de")) || null;
+}
+
+function speakCurrent() {
+  if (!playing || !synth) return;
+  const q = queue[pos];
+  if (!q) { setPlaying(false); pos = 0; highlight(); return; }
+  highlight();
+  if (q.el) q.el.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  const u = new SpeechSynthesisUtterance(q.text);
+  u.lang = "de-DE";
+  const v = voiceFor(); if (v) u.voice = v;
+  u.rate = parseFloat($("rate").value);
+  u.onend = () => { if (playing && queue[pos] === q) { pos++; speakCurrent(); } };
+  synth.speak(u);
+}
+
+function setPlaying(on) {
+  playing = on;
+  $("desk").classList.toggle("playing", on);
+  $("play").setAttribute("aria-label", on ? "Pausieren" : "Abspielen");
+  $("play-icon").innerHTML = on ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>' : '<path d="M7 4.5v15l13-7.5z"/>';
+}
+
+function stop() { if (synth) synth.cancel(); setPlaying(false); }
+function playFrom(idx) { if (synth) synth.cancel(); pos = idx; setPlaying(true); speakCurrent(); }
+function jumpTo(seg) { const idx = queue.findIndex((q) => q.seg === seg); if (idx >= 0) { if (playing) playFrom(idx); else { pos = idx; highlight(); $("seg-" + seg).scrollIntoView({ block: "start" }); } } }
+
+$("play").addEventListener("click", () => {
+  if (!synth) { $("status").textContent = "Dein Browser kann nicht vorlesen. Der Text steht unten zum Lesen."; return; }
+  if (playing) { stop(); highlight(); } else playFrom(pos);
+});
+$("next").addEventListener("click", () => { const s = queue[pos]?.seg ?? -1; jumpTo(Math.min(s + 1, Math.max(...queue.map((q) => q.seg)))); });
+$("prev").addEventListener("click", () => { const s = queue[pos]?.seg ?? 0; jumpTo(Math.max(0, s - 1)); });
+
+const savedRate = store.get("rate"); if (savedRate) $("rate").value = savedRate;
+$("rate-val").textContent = (+$("rate").value).toFixed(2) + "×";
+$("rate").addEventListener("input", () => { $("rate-val").textContent = (+$("rate").value).toFixed(2) + "×"; store.set("rate", $("rate").value); });
+$("rate").addEventListener("change", () => { if (playing) playFrom(pos); });
+
+function fillVoices() {
+  const de = (synth?.getVoices() || []).filter((v) => v.lang?.startsWith("de"));
+  if (!de.length) return;
+  const sel = $("voice"); sel.textContent = "";
+  const chosen = voiceFor();
+  for (const v of de) { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name; if (chosen && v.name === chosen.name) o.selected = true; sel.append(o); }
+  $("voice-row").hidden = false;
+}
+if (synth) { fillVoices(); synth.addEventListener?.("voiceschanged", fillVoices); }
+$("voice").addEventListener("change", (e) => { store.set("voice", e.target.value); if (playing) playFrom(pos); });
+
+function renderArchive() {
+  const list = $("archive-list"); list.textContent = "";
+  $("archive").hidden = episodes.length < 2;
+  for (const ep of episodes) {
+    const li = document.createElement("li"); const b = document.createElement("button");
+    b.setAttribute("aria-current", String(current && ep.date === current.date));
+    const d = document.createElement("span"); d.className = "d"; d.textContent = new Date(ep.date + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" });
+    const t = document.createElement("span"); t.className = "t"; t.textContent = ep.title || "Folge";
+    b.append(d, t); b.addEventListener("click", () => { render(ep); window.scrollTo({ top: 0 }); });
+    li.append(b); list.append(li);
+  }
+}
+
+(async () => {
+  const db = await window.claude?.use?.("db");
+  if (!db) { $("status").textContent = "Folgen konnten nicht geladen werden. Öffne die Seite angemeldet auf claude.ai."; return; }
+  db.collection("episodes").orderBy("date", "desc").limit(60).onSnapshot((snap) => {
+    episodes = snap.docs.map((d) => d.data()).filter((e) => e && e.date);
+    if (!episodes.length) { $("status").textContent = "Noch keine Folge"; return; }
+    const newest = episodes[0];
+    if (!current) render(newest);
+    else if (!playing && newest.date !== current.date) render(newest);
+    else renderArchive();
+  }, () => { $("status").textContent = "Verbindung zu den Folgen unterbrochen. Lade die Seite neu."; });
+})();
+</script>
