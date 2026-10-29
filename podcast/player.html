@@ -104,7 +104,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
       <label class="rate">Tempo <input type="range" id="rate" min="0.8" max="1.6" step="0.05" value="1.05"> <span id="rate-val">1.05×</span></label>
     </div>
     <nav class="chapters" id="chapters" aria-label="Abschnitte"></nav>
-    <div class="voice" id="voice-row" hidden><label for="voice">Stimme</label><select id="voice"></select></div>
+    <div class="voice" id="voice-row" hidden><label for="voice">Stimme</label><select id="voice"></select><span id="voice-hint"></span></div>
     <div class="meta" id="meta"></div>
   </section>
 
@@ -233,7 +233,7 @@ function speakCurrent() {
   if (q.el) q.el.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   const u = new SpeechSynthesisUtterance(q.text);
   u.lang = "de-DE";
-  const v = voiceFor(); if (v) u.voice = v;
+  const v = voiceFor(); if (v) { u.voice = v; u.lang = v.lang; }
   u.rate = parseFloat($("rate").value);
   u.onend = () => { if (playing && queue[pos] === q) { pos++; speakCurrent(); } };
   synth.speak(u);
@@ -263,14 +263,25 @@ $("rate").addEventListener("input", () => { $("rate-val").textContent = (+$("rat
 $("rate").addEventListener("change", () => { if (playing) playFrom(pos); });
 
 function fillVoices() {
-  const de = (synth?.getVoices() || []).filter((v) => v.lang?.startsWith("de"));
-  if (!de.length) return;
+  const de = (synth?.getVoices() || []).filter((v) => v.lang?.toLowerCase().startsWith("de"));
+  $("voice-row").hidden = false;
+  if (!de.length) {
+    $("voice").hidden = true;
+    $("voice-hint").textContent = "Dieser Browser stellt keine Stimmen zur Auswahl bereit. Öffne den Link in Safari, um die Stimme zu wechseln.";
+    return;
+  }
+  $("voice").hidden = false;
+  $("voice-hint").textContent = de.length === 1 ? "Nur eine deutsche Stimme gefunden. Weitere lädst du in den iPhone-Einstellungen unter Gesprochene Inhalte." : "";
   const sel = $("voice"); sel.textContent = "";
   const chosen = voiceFor();
-  for (const v of de) { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name; if (chosen && v.name === chosen.name) o.selected = true; sel.append(o); }
-  $("voice-row").hidden = false;
+  for (const v of de) { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name + (v.localService === false ? " (online)" : ""); if (chosen && v.name === chosen.name) o.selected = true; sel.append(o); }
 }
-if (synth) { fillVoices(); synth.addEventListener?.("voiceschanged", fillVoices); }
+// iOS liefert die Stimmen oft verzögert und ohne voiceschanged-Event.
+if (synth) {
+  fillVoices();
+  synth.addEventListener?.("voiceschanged", fillVoices);
+  [300, 1000, 2500].forEach((ms) => setTimeout(fillVoices, ms));
+}
 $("voice").addEventListener("change", (e) => { store.set("voice", e.target.value); if (playing) playFrom(pos); });
 
 function renderArchive() {
