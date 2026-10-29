@@ -85,6 +85,14 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .archive .t { font-family: var(--display); min-width: 0; }
 
 .empty { color: var(--muted); max-width: 60ch; }
+
+/* Lesemodus: nur Sprechtext, damit "Bildschirminhalt sprechen" nichts anderes vorliest */
+.exit-read { justify-self: start; }
+body.reading .mast, body.reading .desk, body.reading .src, body.reading .archive, body.reading .seg h3 .tag, body.reading .talk li::before { display: none; }
+body.reading .s.on { background: none; }
+body.reading .script { font-size: 1.1rem; }
+body.reading .read-tip { display: block; }
+.read-tip { display: none; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
 </style>
 
 <div class="wrap">
@@ -101,6 +109,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
       <button class="play" id="play" aria-label="Abspielen"><svg viewBox="0 0 24 24" id="play-icon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
       <button class="ghost" id="prev" aria-label="Vorheriger Abschnitt">‹ Zurück</button>
       <button class="ghost" id="next" aria-label="Nächster Abschnitt">Weiter ›</button>
+      <button class="ghost" id="read-mode">Lesemodus</button>
       <label class="rate">Tempo <input type="range" id="rate" min="0.8" max="1.6" step="0.05" value="1.05"> <span id="rate-val">1.05×</span></label>
     </div>
     <nav class="chapters" id="chapters" aria-label="Abschnitte"></nav>
@@ -109,6 +118,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   </section>
 
   <article class="script" id="script"></article>
+  <button class="ghost exit-read" id="exit-read" hidden>Lesemodus beenden</button>
 
   <section class="archive" id="archive" hidden>
     <h3>Frühere Folgen</h3>
@@ -296,6 +306,19 @@ function renderArchive() {
     li.append(b); list.append(li);
   }
 }
+
+function setReading(on) {
+  if (on) stop();
+  document.body.classList.toggle("reading", on);
+  $("exit-read").hidden = !on;
+  if (on && location.hash !== "#lesen") location.hash = "lesen";
+  if (!on && location.hash === "#lesen") history.replaceState(null, "", location.pathname + location.search);
+  window.scrollTo({ top: 0 });
+}
+$("read-mode").addEventListener("click", () => setReading(true));
+$("exit-read").addEventListener("click", () => setReading(false));
+window.addEventListener("hashchange", () => setReading(location.hash === "#lesen"));
+if (location.hash === "#lesen") setReading(true);
 
 (async () => {
   const db = await window.claude?.use?.("db");
