@@ -59,7 +59,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .chap { border: 1px solid var(--line); background: transparent; border-radius: 8px; padding: 6px 10px; font-family: var(--display); font-size: 0.82rem; display: flex; gap: 6px; align-items: center; max-width: 100%; }
 .chap .tag { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .chap[aria-current="true"] { border-color: var(--ink); background: var(--bg); }
-.k-welt { color: var(--k-welt); } .k-ki { color: var(--k-ki); } .k-hr { color: var(--k-hr); } .k-smalltalk, .k-intro { color: var(--k-talk); }
+.k-welt { color: var(--k-welt); } .k-ki { color: var(--k-ki); } .k-hr { color: var(--k-hr); } .k-smalltalk, .k-intro, .k-outro { color: var(--k-talk); } .k-wetter, .k-termine { color: var(--muted); }
 .meta { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
 .voice { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .voice select { font: inherit; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; max-width: 100%; }
@@ -132,7 +132,8 @@ body.reading .read-tip { display: block; }
 </div>
 
 <script>
-const LABEL = { intro: "Intro", welt: "Welt", ki: "KI", hr: "HR", smalltalk: "Smalltalk", outro: "Outro" };
+const LABEL = { intro: "Intro", welt: "Welt", ki: "KI", hr: "HR", smalltalk: "Smalltalk", termine: "Termine", wetter: "Wetter", outro: "Outro" };
+const TAIL = ["termine", "wetter"];  // laufen am Ende, nach dem Smalltalk
 const $ = (id) => document.getElementById(id);
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -156,8 +157,9 @@ function sentences(text) {
 function segmentsOf(ep) {
   const segs = [];
   if (ep.intro) segs.push({ kind: "intro", heading: "Guten Morgen", script: ep.intro });
-  for (const s of ep.segments || []) segs.push(s);
+  for (const s of ep.segments || []) if (!TAIL.includes(s.kind)) segs.push(s);
   if (ep.smalltalk?.length) segs.push({ kind: "smalltalk", heading: "Für den Smalltalk", list: ep.smalltalk, script: "Und hier noch ein paar Sätze für den Smalltalk. " + ep.smalltalk.join(" ") });
+  for (const k of TAIL) for (const s of ep.segments || []) if (s.kind === k) segs.push(s);
   if (ep.outro) segs.push({ kind: "outro", heading: "Zum Schluss", script: ep.outro });
   return segs;
 }

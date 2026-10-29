@@ -5,6 +5,7 @@ Ermittle das heutige Datum (Europe/Berlin) und suche die Meldungen der letzten 2
 - Welt: 3 wichtigste internationale Nachrichten (Politik, Wirtschaft, Gesellschaft), die man heute im Smalltalk kennen sollte.
 - KI: 2 wichtigste Entwicklungen (Modelle, Firmen, Regulierung, Gesellschaft).
 - HR: 2 Themen, bevorzugt KI im Personalwesen/Recruiting, Arbeitsrecht (BAG, EuGH, Gesetze in DE/EU), Arbeitsmarkt, Studien.
+- Wetter: die Tagesvorhersage für Berlin (Höchst-/Tiefstwert, Regen, Wind, ggf. Warnungen), aus einem Wetterdienst wie DWD, wetter.com oder wetteronline.
 Regeln: Jede Meldung muss von mindestens zwei Quellen oder einer etablierten Primärquelle bestätigt sein. Aggregatoren und Newsletter-Zusammenfassungen sind oft falsch (falsche Namen, alte Meldungen): gegenprüfen. Prüfe das Datum jeder Meldung, nichts Älteres als eine Woche als „neu“ verkaufen. Lies vorher mit ArtifactData (`list`, collection `episodes`, url unten) die letzten Folgen, um Themen nicht zu wiederholen, außer es gibt echte Neuigkeiten.
 
 ## 2. Sprechtext (ca. 1.300–1.450 Wörter gesamt ≈ 10 Minuten)
@@ -16,8 +17,8 @@ Schreibe die Folge als JSON-Datei und speichere sie mit ArtifactData `set`:
 - collection: `episodes`, doc_id: heutiges Datum `YYYY-MM-DD`
 - Felder:
   - `date` ("YYYY-MM-DD"), `title` (prägnant, max. ~70 Zeichen, die 2–3 Hauptthemen), `createdAt` (ISO-Zeit)
-  - `intro` (Begrüßung mit Wochentag/Datum und Themenüberblick, 60–90 Wörter)
-  - `segments`: Liste von `{kind: "welt"|"ki"|"hr", heading, script, sources: [{title, url}]}`; Reihenfolge welt, ki, hr
+  - `intro` (Begrüßung mit Wochentag/Datum und Themenüberblick inkl. Hinweis, dass am Ende das Wetter kommt, 60–90 Wörter)
+  - `segments`: Liste von `{kind: "welt"|"ki"|"hr"|"wetter", heading, script, sources: [{title, url}]}`; Reihenfolge welt, ki, hr, zuletzt genau ein `wetter`-Segment (heading z. B. „Das Wetter in Berlin“, 40–70 Wörter, mit einem praktischen Tipp wie Schirm oder Jacke). Der Player spielt das Wetter automatisch nach dem Smalltalk ab.
   - `smalltalk`: 4–5 Einzeiler zum Mitreden
   - `outro` (1–2 Sätze, Verabschiedung bis morgen um sechs)
 Falls das Dokument schon existiert, lies es erst (`get`) und überschreibe mit `if_version`.
