@@ -85,6 +85,8 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .archive .t { font-family: var(--display); min-width: 0; }
 
 .empty { color: var(--muted); max-width: 60ch; }
+#copy-status { color: var(--accent); }
+#copy-fallback { width: 100%; min-height: 8rem; font: inherit; font-size: 0.9rem; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
 
 /* Lesemodus: nur Sprechtext, damit "Bildschirminhalt sprechen" nichts anderes vorliest */
 .exit-read { justify-self: start; }
@@ -109,12 +111,15 @@ body.reading .read-tip { display: block; }
       <button class="play" id="play" aria-label="Abspielen"><svg viewBox="0 0 24 24" id="play-icon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
       <button class="ghost" id="prev" aria-label="Vorheriger Abschnitt">‹ Zurück</button>
       <button class="ghost" id="next" aria-label="Nächster Abschnitt">Weiter ›</button>
+      <button class="ghost" id="copy-text">Text kopieren</button>
       <button class="ghost" id="read-mode">Lesemodus</button>
       <label class="rate">Tempo <input type="range" id="rate" min="0.8" max="1.6" step="0.05" value="1.05"> <span id="rate-val">1.05×</span></label>
     </div>
     <nav class="chapters" id="chapters" aria-label="Abschnitte"></nav>
     <div class="voice" id="voice-row" hidden><label for="voice">Stimme</label><select id="voice"></select><span id="voice-hint"></span></div>
     <div class="meta" id="meta"></div>
+    <div class="meta" id="copy-status" role="status"></div>
+    <textarea id="copy-fallback" readonly hidden aria-label="Text der Folge"></textarea>
   </section>
 
   <article class="script" id="script"></article>
@@ -306,6 +311,24 @@ function renderArchive() {
     li.append(b); list.append(li);
   }
 }
+
+// Reiner Sprechtext für den iPhone-Kurzbefehl "Text sprechen".
+function plainText(ep) {
+  return segmentsOf(ep).map((s) => (s.kind === "intro" || s.kind === "outro" ? "" : s.heading + ".\n\n") + s.script).join("\n\n");
+}
+$("copy-text").addEventListener("click", async () => {
+  if (!current) return;
+  const text = plainText(current);
+  const fb = $("copy-fallback");
+  try {
+    await navigator.clipboard.writeText(text);
+    fb.hidden = true;
+    $("copy-status").textContent = "Kopiert. Starte jetzt deinen Kurzbefehl „Briefing vorlesen“.";
+  } catch {
+    fb.value = text; fb.hidden = false; fb.focus(); fb.select();
+    $("copy-status").textContent = "Automatisches Kopieren ging nicht. Der Text ist markiert: tippe darauf und wähle „Kopieren“.";
+  }
+});
 
 function setReading(on) {
   if (on) stop();
